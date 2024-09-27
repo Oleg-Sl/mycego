@@ -1,6 +1,7 @@
 from django.shortcuts import render, redirect
 from django.views import View
 from requests_oauthlib import OAuth2Session
+from django.core.cache import cache
 
 from .form import PublicUrlForm, ClientDataForm, CodeForm
 from .services.token_utils import get_token, get_authorization_url
@@ -81,12 +82,16 @@ class IndexView(View):
             form_data = form.cleaned_data
             public_url = form_data.get('url')
 
-            ya_disk_api = YaDiskAPI(token)
-            result, status = ya_disk_api.get_public_resources(public_url)
-            if not status:
-                return render(request, 'yadiskmanagerapp/index.html', {'form': form, 'files': [], 'file_types': YADISK_FILE_TYPES, 'error': result.get('message')})
+            data_files = cache.get(public_url)
+            if data_files is None:
+                ya_disk_api = YaDiskAPI(token)
+                result, status = ya_disk_api.get_public_resources(public_url)
+                if not status:
+                    return render(request, 'yadiskmanagerapp/index.html', {'form': form, 'files': [], 'file_types': YADISK_FILE_TYPES, 'error': result.get('message')})
+                data_files = result.get('_embedded', {}).get('items', [])
+                cache.set(public_url, data_files, 300)
+                print(data_files)
             
-            data_files = result.get('_embedded', {}).get('items', [])
             filter_data_files = [file for file in data_files if not file_type or file.get('media_type') == file_type]
             return render(request, 'yadiskmanagerapp/index.html', {'form': form, 'files': filter_data_files, 'file_types': YADISK_FILE_TYPES})
 
