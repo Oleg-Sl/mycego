@@ -30,6 +30,7 @@ class GetSecretCodeView(View):
 
         return render(request, 'yadiskmanagerapp/auth_url.html', {'form': form})
 
+
 class GetTokenView(View):
     def get(self, request):
         form = CodeForm()
@@ -90,7 +91,6 @@ class IndexView(View):
                     return render(request, 'yadiskmanagerapp/index.html', {'form': form, 'files': [], 'file_types': YADISK_FILE_TYPES, 'error': result.get('message')})
                 data_files = result.get('_embedded', {}).get('items', [])
                 cache.set(public_url, data_files, 300)
-                print(data_files)
             
             filter_data_files = [file for file in data_files if not file_type or file.get('media_type') == file_type]
             return render(request, 'yadiskmanagerapp/index.html', {'form': form, 'files': filter_data_files, 'file_types': YADISK_FILE_TYPES})
