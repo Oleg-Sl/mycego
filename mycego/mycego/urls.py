@@ -2,10 +2,10 @@
 from django.contrib import admin
 from django.urls import path, include
 
-from yadiskmanagerapp.views import get_secret_code, get_secret_token, get_file_list
+from yadiskmanagerapp.views import GetSecretCodeView, GetTokenView, IndexView
 
 urlpatterns = [
-    path('', get_file_list, name='files'),
-    path('secret_code', get_secret_code, name='secret_code'),
-    path('secret_token', get_secret_token, name='secret_token'),
+    path('', IndexView.as_view(), name='index'),
+    path('auth/url', GetSecretCodeView.as_view(), name='auth_url'),
+    path('auth/token', GetTokenView.as_view(), name='get_token'),
 ]

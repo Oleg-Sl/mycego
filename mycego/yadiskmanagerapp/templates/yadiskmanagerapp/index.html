@@ -11,6 +11,11 @@
 </head>
 <body>
     <div class="container text-center">
+        <div class="alert alert-primary" role="alert">
+            <a href="{% url 'auth_url' %}">Сменить авторизацию</a>
+        </div>
+        <br>
+
         <form action="{%url 'index' %}" method="post" class="d-flex flex-column">
             {% csrf_token %}
             {% for field in form %}
@@ -23,9 +28,26 @@
                     {% endif %}
                 </div>
             {% endfor %}
+            <div class="mb-3">
+                <label class="form-label float-start" for="">Выберите тип файла для просмотра</label>
+                <select class="form-select form-select-lg mb-3" name="file_type" aria-label=".form-select-lg пример">
+                    <option value="" selected>Все</option>
+                    {% for key, val in file_types.items %}
+                        <option value="{{ key }}">{{ val }}</option>
+                    {% endfor %}
+                </select>
+            </div>
             <button type="submit" class="btn btn-primary">Получить список</button>
         </form>
 
+        {% if error %}
+            <br>
+            <div class="alert alert-danger" role="alert">
+                <b>Ошибка: </b> {{ error }}
+            </div>
+        {% endif %}
+
+        <br>
         <h2>Файлы:</h2>
         <ul>
             {% for file in files %}
@@ -59,13 +81,6 @@
         </ul>
     </div>
 
-
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous"></script>
-    
-    <script>
-        document.addEventListener("DOMContentLoaded", function() {
-            console.log("files = ", {{ files }});
-        });
-    </script>
 </body>
 </html>

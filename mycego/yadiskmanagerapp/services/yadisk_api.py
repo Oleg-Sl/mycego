@@ -21,6 +21,4 @@ class YaDiskAPI:
             'public_key': public_key,
         }
         response = requests.get(url, headers=headers, params=params)
-        return response.json()
-
-    
+        return response.json(), response.ok
