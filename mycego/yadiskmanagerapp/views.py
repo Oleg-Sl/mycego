@@ -1,4 +1,5 @@
 from django.shortcuts import render, redirect
+from django.http import HttpResponse, HttpRequest
 from django.views import View
 from requests_oauthlib import OAuth2Session
 from django.core.cache import cache
@@ -10,11 +11,11 @@ from .configs.yadisk_file_types import YADISK_FILE_TYPES
 
 
 class GetSecretCodeView(View):
-    def get(self, request):
+    def get(self, request: HttpRequest) -> HttpResponse:
         form = ClientDataForm()
         return render(request, 'yadiskmanagerapp/auth_url.html', {'form': form})
 
-    def post(self, request):
+    def post(self, request: HttpRequest) -> HttpResponse:
         form = ClientDataForm(request.POST)
         if form.is_valid():
             form_data = form.cleaned_data
@@ -32,12 +33,12 @@ class GetSecretCodeView(View):
 
 
 class GetTokenView(View):
-    def get(self, request):
+    def get(self, request: HttpRequest) -> HttpResponse:
         form = CodeForm()
         authorization_url = request.COOKIES.get('authorization_url')
         return render(request, 'yadiskmanagerapp/get_token.html', {'form': form, 'authorization_url': authorization_url})
 
-    def post(self, request):
+    def post(self, request: HttpRequest) -> HttpResponse:
         form = CodeForm(request.POST)
         authorization_url = request.COOKIES.get('authorization_url')
 
@@ -64,7 +65,7 @@ class GetTokenView(View):
 
 
 class IndexView(View):
-    def get(self, request):
+    def get(self, request: HttpRequest) -> HttpResponse:
         token = request.COOKIES.get('token')
         if token is None:
             return redirect('auth_url')
@@ -72,7 +73,7 @@ class IndexView(View):
         form = PublicUrlForm()
         return render(request, 'yadiskmanagerapp/index.html', {'form': form, 'files': [], 'file_types': YADISK_FILE_TYPES})
 
-    def post(self, request):
+    def post(self, request: HttpRequest) -> HttpResponse:
         token = request.COOKIES.get('token')
         if token is None:
             return redirect('auth_url')
